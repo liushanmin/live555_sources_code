@@ -1,5 +1,5 @@
 INCLUDES = -Iinclude -I../groupsock/include
-PREFIX = /usr/local
+PREFIX =./out
 LIBDIR = $(PREFIX)/lib
 ##### Change the following for your environment:
 COMPILE_OPTS =		$(INCLUDES) -I/usr/local/include -I. -O2 -DSOCKLEN_T=socklen_t -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64
