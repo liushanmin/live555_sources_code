@@ -6,6 +6,7 @@ COMPILE_OPTS =		$(INCLUDES) -I/usr/local/include -I. -O2 -DSOCKLEN_T=socklen_t -
                     -DNO_STD_LIB \
                     -DNO_OPENSSL=1 \
                     -DLOCALE_NOT_USED
+# DLOCALE_NOT_USED 参考Locale.hh注释
 
 C =			c
 C_COMPILER =		$(CROSS_COMPILE)gcc
@@ -24,6 +25,7 @@ CONSOLE_LINK_OPTS =	$(LINK_OPTS)
 LIBRARY_LINK =		$(CROSS_COMPILE)ar cr 
 LIBRARY_LINK_OPTS =	$(LINK_OPTS)
 LIB_SUFFIX =			a
+# 无需连接库，需要时可以编译
 # LIBS_FOR_CONSOLE_APPLICATION = -lssl -lcrypto
 LIBS_FOR_GUI_APPLICATION =
 EXE =

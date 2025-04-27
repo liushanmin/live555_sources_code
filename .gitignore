@@ -1,1 +1,4 @@
 **/[Mm]akefile
+**/*.o
+**/*.a
+/output/*
