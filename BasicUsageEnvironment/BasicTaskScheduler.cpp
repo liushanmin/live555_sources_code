@@ -32,12 +32,22 @@ BasicTaskScheduler* BasicTaskScheduler::createNew(unsigned maxSchedulerGranulari
 	return new BasicTaskScheduler(maxSchedulerGranularity);
 }
 
+/* fMaxSchedulerGranularity:
+    用于控制 调度器（scheduler）中各任务的最小调度粒度，单位是微秒（us，即百万分之一秒）。
+    即：处理各事件之间的 最小时间间隔(事件周期)
+    createNew 重载，默认值 10毫秒，10000 us
+    设置的越小 占用cpu资源越高
+ */
 BasicTaskScheduler::BasicTaskScheduler(unsigned maxSchedulerGranularity)
   : fMaxSchedulerGranularity(maxSchedulerGranularity), fMaxNumSockets(0)
 #if defined(__WIN32__) || defined(_WIN32)
   , fDummySocketNum(-1)
 #endif
 {
+  /* 
+      在一些严格控制依赖关系或嵌入式环境下，避免引入额外的函数调用（如 memset）可以减少依赖、提升可移植性。
+      FD_ZERO 本身大小不大（默认支持 1024 个 fd，128 字节），手动清零性能无太大差异。 
+  */
   FD_ZERO(&fReadSet);
   FD_ZERO(&fWriteSet);
   FD_ZERO(&fExceptionSet);
@@ -55,7 +65,10 @@ void BasicTaskScheduler::schedulerTickTask(void* clientData) {
   ((BasicTaskScheduler*)clientData)->schedulerTickTask();
 }
 
+// 注册一个定时器任务 根据 fMaxSchedulerGranularity
 void BasicTaskScheduler::schedulerTickTask() {
+
+   //第二个参数是一个函数指针，触发任务时就执行这个任务函数
   scheduleDelayedTask(fMaxSchedulerGranularity, schedulerTickTask, this);
 }
 
