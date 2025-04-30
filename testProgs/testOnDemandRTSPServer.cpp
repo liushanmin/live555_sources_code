@@ -72,6 +72,7 @@ int main(int argc, char** argv) {
   RTSPServer* rtspServer = RTSPServer::createNew(*env, 322, authDB);
 #else
   // Serve regular RTSP (over a TCP connection):
+  // tcp连接下的rtsp 服务实例创建
   RTSPServer* rtspServer = RTSPServer::createNew(*env, 8554, authDB);
 #endif
   if (rtspServer == NULL) {

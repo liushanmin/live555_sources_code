@@ -296,7 +296,7 @@ int setupStreamSocket(UsageEnvironment& env, Port port, int domain,
     socketErr(env, "Failed to initialize 'winsock': ");
     return -1;
   }
-
+  // 1. 创建socket套接字
   int newSocket = createSocket(domain, SOCK_STREAM);
   if (newSocket < 0) {
     socketErr(env, "unable to create stream socket: ");
@@ -305,6 +305,7 @@ int setupStreamSocket(UsageEnvironment& env, Port port, int domain,
 
   int reuseFlag = groupsockPriv(env)->reuseFlag;
   reclaimGroupsockPriv(env);
+  // 允许端口快速的被复用
   if (setsockopt(newSocket, SOL_SOCKET, SO_REUSEADDR,
 		 (const char*)&reuseFlag, sizeof reuseFlag) < 0) {
     socketErr(env, "setsockopt(SO_REUSEADDR) error: ");
@@ -337,6 +338,7 @@ int setupStreamSocket(UsageEnvironment& env, Port port, int domain,
     if (port.num() != 0 || ReceivingInterfaceAddr != INADDR_ANY) {
 #endif
       MAKE_SOCKADDR_IN(name, ReceivingInterfaceAddr, port.num());
+      // 绑定
       if (bind(newSocket, (struct sockaddr*)&name, sizeof name) != 0) {
 	char tmpBuffer[100];
 	sprintf(tmpBuffer, "IPv4 bind() error (port number: %d): ", ntohs(port.num()));
@@ -485,7 +487,7 @@ static unsigned getBufferSize(UsageEnvironment& env, int bufOptName,
     return 0;
   }
 
-  return curSize;
+  return curSize;  // 返回当前 socket 的缓冲区大小。
 }
 unsigned getSendBufferSize(UsageEnvironment& env, int socket) {
   return getBufferSize(env, SO_SNDBUF, socket);
@@ -526,6 +528,10 @@ static unsigned increaseBufferTo(UsageEnvironment& env, int bufOptName,
       // success
       return requestedSize;
     }
+    /* 
+      在 setsockopt 设置失败时,
+      将 requestedSize 减小一半（趋近当前缓冲区大小），然后重试设置, loop
+    */
     requestedSize = (requestedSize+curSize)/2;
   }
 

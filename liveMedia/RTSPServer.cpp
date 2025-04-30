@@ -191,6 +191,7 @@ RTSPServer::RTSPServer(UsageEnvironment& env,
     fRegisterOrDeregisterRequestCounter(0), fAuthDB(authDatabase),
     fAllowStreamingRTPOverTCP(True),
     fOurConnectionsUseTLS(False), fWeServeSRTP(False) {
+    // in func do notiong
 }
 
 // A data structure that is used to implement "fTCPStreamingDatabase"

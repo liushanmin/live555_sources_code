@@ -32,7 +32,7 @@ extern "C" int initializeWinsockIfNecessary();
 #endif
 
 BasicUsageEnvironment::BasicUsageEnvironment(TaskScheduler& taskScheduler)
-: BasicUsageEnvironment0(taskScheduler) {
+: BasicUsageEnvironment0(taskScheduler) { // BasicUsageEnvironment不做任何初始化,在父类(BasicUsageEnvironment0)中初始化
 #if defined(__WIN32__) || defined(_WIN32)
   if (!initializeWinsockIfNecessary()) {
     setResultErrMsg("Failed to initialize 'winsock': ");
