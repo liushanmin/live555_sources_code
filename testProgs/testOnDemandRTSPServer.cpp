@@ -73,6 +73,7 @@ int main(int argc, char** argv) {
 #else
   // Serve regular RTSP (over a TCP connection):
   // tcp连接下的rtsp 服务实例创建
+  //创建一个rtsp的服务，这个服务实现RSTP相关协议
   RTSPServer* rtspServer = RTSPServer::createNew(*env, 8554, authDB);
 #endif
   if (rtspServer == NULL) {
@@ -113,13 +114,23 @@ int main(int argc, char** argv) {
   {
     char const* streamName = "h264ESVideoTest";
     char const* inputFileName = "test.264";
+    // 创建一个会话，它会添加给rtsp服务，大概的意思就是 告诉rtsp服务有一个流可以它管理了
     ServerMediaSession* sms
       = ServerMediaSession::createNew(*env, streamName, streamName,
 				      descriptionString);
+
+    /* 
+      当然管理之前，你需要先注册一个实例，实现里边所有的管理function,将来给rtsp服务调度。
+      这里先实现一个live555写好的一个H265VideoFileServerMediaSubsession实例，
+      这个实例的流程是从一个h265文件中读取数据作为RTP流的来源。
+      也可以定制这个类，来实现从我们想要的位置（ 设备节点、网络拉取）获取数据。
+    */
     sms->addSubsession(H264VideoFileServerMediaSubsession
 		       ::createNew(*env, inputFileName, reuseFirstSource));
-    rtspServer->addServerMediaSession(sms);
 
+    //将ServerMediaSession添加到rstp服务
+    rtspServer->addServerMediaSession(sms);
+    // 打印
     announceStream(rtspServer, sms, streamName, inputFileName);
   }
 
@@ -460,6 +471,7 @@ int main(int argc, char** argv) {
     *env << "\n(RTSP-over-" << httpProtocolStr << " tunneling is not available.)\n";
   }
 
+  //开始运行服务
   env->taskScheduler().doEventLoop(); // does not return
 
   return 0; // only to prevent compiler warning
